@@ -1,14 +1,9 @@
 import React from "react";
-import { DarkTheme, Provider as PaperProvider } from "react-native-paper";
+import { Provider as PaperProvider } from "react-native-paper";
+
+import { theme } from "./src/core/theme";
 
 import App from "./src/index";
-
-const theme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-  },
-};
 
 const Main = () => {
   return (
