@@ -8,13 +8,21 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@project-serum/sol-wallet-adapter": "^0.2.5",
+    "@react-native-async-storage/async-storage": "^1.15.8",
+    "@solana/wallet-adapter-base": "^0.6.0",
+    "@solana/wallet-adapter-react": "^0.12.1",
+    "@solana/wallet-adapter-react-ui": "^0.4.1",
+    "@solana/wallet-adapter-wallets": "^0.10.0",
+    "@solana/web3.js": "^1.29.0",
     "expo": "~42.0.1",
     "expo-status-bar": "~1.0.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
     "react-native-paper": "^4.9.2",
-    "react-native-web": "~0.13.12"
+    "react-native-web": "~0.13.12",
+    "use-local-store": "^0.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

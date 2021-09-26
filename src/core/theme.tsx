@@ -5,5 +5,6 @@ export const theme = {
   colors: {
     ...DarkTheme.colors,
     primary: "#00f5d8",
+    text: "#00f5d8",
   },
 };

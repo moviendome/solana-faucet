@@ -23,12 +23,13 @@ const Button = ({mode, style, children, ...props}: Props) => (
 const styles = StyleSheet.create({
   button: {
     width: "100%",
-    marginVertical: 10,
+    paddingVertical: 3,
   },
   text: {
     fontWeight: "bold",
     fontSize: 15,
     lineHeight: 26,
+    textTransform: "capitalize"
   },
 });
 
