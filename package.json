@@ -21,8 +21,7 @@
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
     "react-native-paper": "^4.9.2",
-    "react-native-web": "~0.13.12",
-    "use-local-store": "^0.0.2"
+    "react-native-web": "~0.13.12"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

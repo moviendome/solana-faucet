@@ -14,7 +14,7 @@ import {
   WalletDisconnectButton,
 } from "@solana/wallet-adapter-react-ui";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getData, storeData} from "./common"
 
 import {Background, Button} from "./components"
 
@@ -23,6 +23,10 @@ import {StyleSheet, View} from "react-native";
 import {Text, withTheme} from "react-native-paper"
 
 const App = ({theme}) => {
+  const [solSent, setSolSent] = useState(false)
+  const [solSending, setSolSending] = useState(false);
+  const [solSentLabel, setSolSentLabel] = useState("Send 1 SOL");
+
   const {colors} = theme;
 
   const {connection} = useConnection();
@@ -30,6 +34,8 @@ const App = ({theme}) => {
 
   const _send = useCallback(async () => {
     if (!publicKey) throw new WalletNotConnectedError();
+
+    setSolSending(true)
 
     const transaction = new Transaction().add(
       SystemProgram.transfer({
@@ -39,36 +45,53 @@ const App = ({theme}) => {
       })
     );
 
-    const signature = await sendTransaction(transaction, connection);
+    try {
+      const signature = await sendTransaction(transaction, connection);
 
-    await connection.confirmTransaction(signature, 'processed');
+      const processed = await connection.confirmTransaction(signature, 'processed');
+
+      if (processed) {
+        await storeData();
+        setSolSent(true);
+      }
+    } catch (e) {
+      setSolSending(false)
+    }
+
   }, [publicKey, sendTransaction, connection]);
 
+  useEffect(() => {
+    async function init() {
+      const sent = await getData();
+      setSolSent(sent)
+    }
 
-  const _requestAirDrop = async () => {
-    const publicKey = new PublicKey("Dw6N2qHyMxarhNB3oV5MHrg1CKVi9LihUdZxn4MqBnza");
+    init();
+  }, []);
 
-    const airdropSignature = await connection.requestAirdrop(
-      publicKey,
-      LAMPORTS_PER_SOL
-    );
-
-    const signature = await connection.confirmTransaction(airdropSignature);
-    return signature;
-  };
-
-  // {publicKey === null ? (
   return (
     <Background position="bottom">
       <WalletModalProvider>
-        <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-          <View style={{width: 300}}>
-            <WalletMultiButton />
+        <View style={styles.row}>
+          <View style={[styles.row]}>
+            <View style={{marginRight: 20}}>
+              {(publicKey === null) ? (
+                <WalletMultiButton>
+                  Choose a Wallet to Connect
+                </WalletMultiButton>) : (<WalletMultiButton />)}
+            </View>
+            {publicKey !== null && (
+              <WalletDisconnectButton />
+            )}
           </View>
 
           {publicKey !== null && (
             <View style={{width: 300}}>
-              <Button mode="contained" onPress={() => _send()}>Send some tokens</Button>
+              { !solSent ? (
+                <Button mode="contained" loading={solSending} disabled={solSending} onPress={() => _send()}>{solSentLabel}</Button>
+              ) : (
+                  <Button mode="contained" disabled={true}>1 SOL Sent</Button>
+                )}
             </View>)}
         </View>
 
@@ -83,6 +106,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between"
+  }
 });
 
 export default withTheme(App);
