@@ -2,11 +2,14 @@ import React, { useMemo } from "react";
 import { Provider as PaperProvider } from "react-native-paper";
 
 import { clusterApiUrl } from "@solana/web3.js";
+
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+
 import {
   getPhantomWallet,
   getSolflareWallet,
 } from "@solana/wallet-adapter-wallets";
+
 import {
   WalletProvider,
   ConnectionProvider,
@@ -17,7 +20,6 @@ import { theme } from "./src/core/theme";
 import App from "./src/index";
 
 const Main = () => {
-  // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network = WalletAdapterNetwork.Devnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
@@ -38,3 +40,5 @@ const Main = () => {
 };
 
 export default Main;
+
+// <a href='https://www.freepik.com/photos/abstract-background'>Abstract background photo created by rawpixel.com - www.freepik.com</a>

@@ -1,115 +1,140 @@
-import React, {useMemo, useEffect, useState, useCallback} from "react"
-import {
-  useConnection,
-  useWallet,
-} from "@solana/wallet-adapter-react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 
-import {WalletNotConnectedError} from '@solana/wallet-adapter-base';
-import {PublicKey, Keypair, SystemProgram, Transaction, LAMPORTS_PER_SOL} from '@solana/web3.js';
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+
+// import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
+
+import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 import {
   WalletModalProvider,
-  WalletConnectButton,
   WalletMultiButton,
   WalletDisconnectButton,
 } from "@solana/wallet-adapter-react-ui";
 
-import {getData, storeData} from "./common"
+import { Background, Button } from "./components";
 
-import {Background, Button} from "./components"
+import { StyleSheet, View } from "react-native";
 
-import {StyleSheet, View} from "react-native";
+const BUTTON_TEXT = "Request Airdrop";
+const BUTTON_TEXT_LOADING = "Requesting Airdrop...";
 
-import {Text, withTheme} from "react-native-paper"
+const App = () => {
+  const [balance, setBalance] = useState(0);
 
-const App = ({theme}) => {
-  const [solSent, setSolSent] = useState(false)
-  const [solSending, setSolSending] = useState(false);
-  const [solSentLabel, setSolSentLabel] = useState("Send 1 SOL");
+  const [requestAirdropButton, setRequestAirdropButton] = useState({
+    text: BUTTON_TEXT,
+    loading: false,
+  });
 
-  const {colors} = theme;
+  const { connection } = useConnection();
+  const { publicKey } = useWallet();
 
-  const {connection} = useConnection();
-  const {publicKey, sendTransaction} = useWallet();
+  const getBalance = async (publicKey) => {
+    const _publicKey = new PublicKey(publicKey);
 
-  const _send = useCallback(async () => {
-    if (!publicKey) throw new WalletNotConnectedError();
+    const lamports = await connection.getBalance(_publicKey).catch((err) => {
+      console.error(`Error: ${err}`);
+    });
 
-    setSolSending(true)
+    const sol = lamports / LAMPORTS_PER_SOL;
+    return sol;
+  };
 
-    const transaction = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey: publicKey,
-        toPubkey: Keypair.generate().publicKey,
-        lamports: 1,
-      })
+  const requestAirDrop = async (publicKey) => {
+    setRequestAirdropButton({ text: BUTTON_TEXT_LOADING, loading: true });
+
+    const airdropSignature = await connection.requestAirdrop(
+      publicKey,
+      LAMPORTS_PER_SOL
     );
 
-    try {
-      const signature = await sendTransaction(transaction, connection);
+    await connection.confirmTransaction(airdropSignature);
 
-      const processed = await connection.confirmTransaction(signature, 'processed');
-
-      if (processed) {
-        await storeData();
-        setSolSent(true);
-      }
-    } catch (e) {
-      setSolSending(false)
-    }
-
-  }, [publicKey, sendTransaction, connection]);
+    const balance = await getBalance(publicKey.toString());
+    setBalance(balance);
+    setRequestAirdropButton({ text: BUTTON_TEXT, loading: false });
+  };
 
   useEffect(() => {
-    async function init() {
-      const sent = await getData();
-      setSolSent(sent)
+    async function checkBalance() {
+      const _balance = await getBalance(publicKey);
+      setBalance(_balance);
     }
 
-    init();
-  }, []);
+    if (publicKey) {
+      checkBalance();
+    }
+  }, [publicKey]);
+
+  const BalanceComponent = () => {
+    return (
+      <Button mode="outlined" style={styles.balance}>{`${balance} SOL`}</Button>
+    );
+  };
+
+  const AskForAirdropComponent = () => {
+    return (
+      <View>
+        <Button
+          mode="contained"
+          onPress={() => requestAirDrop(publicKey)}
+          loading={requestAirdropButton.loading}
+        >
+          {requestAirdropButton.text}
+        </Button>
+      </View>
+    );
+  };
 
   return (
-    <Background position="bottom">
-      <WalletModalProvider>
-        <View style={styles.row}>
-          <View style={[styles.row]}>
-            <View style={{marginRight: 20}}>
-              {(publicKey === null) ? (
-                <WalletMultiButton>
-                  Choose a Wallet to Connect
-                </WalletMultiButton>) : (<WalletMultiButton />)}
+    <WalletModalProvider>
+      <Background>
+        <View style={styles.container}>
+          {publicKey === null ? (
+            <View style={styles.contemt}>
+              <WalletMultiButton />
             </View>
-            {publicKey !== null && (
-              <WalletDisconnectButton />
-            )}
-          </View>
-
-          {publicKey !== null && (
-            <View style={{width: 300}}>
-              { !solSent ? (
-                <Button mode="contained" loading={solSending} disabled={solSending} onPress={() => _send()}>{solSentLabel}</Button>
-              ) : (
-                  <Button mode="contained" disabled={true}>1 SOL Sent</Button>
-                )}
-            </View>)}
+          ) : (
+            <View style={styles.row}>
+              <View style={styles.requestAirdropButton}>
+                <AskForAirdropComponent />
+              </View>
+              <View>
+                <BalanceComponent />
+              </View>
+              <View>
+                <WalletDisconnectButton />
+              </View>
+            </View>
+          )}
         </View>
-
-      </WalletModalProvider>
-    </Background>
-  )
-}
+      </Background>
+    </WalletModalProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
+  content: {
+    alignSelf: "center",
+  },
   row: {
+    width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between"
-  }
+    justifyContent: "space-between",
+  },
+  requestAirdropButton: {
+    width: 300,
+  },
+  balance: {
+    width: 200,
+  },
 });
 
-export default withTheme(App);
+export default App;
