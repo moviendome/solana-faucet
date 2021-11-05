@@ -1,8 +1,6 @@
-import React, { useMemo, useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-
-// import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
@@ -14,13 +12,13 @@ import {
 
 import { Background, Button } from "./components";
 
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 const BUTTON_TEXT = "Request Airdrop";
 const BUTTON_TEXT_LOADING = "Requesting Airdrop...";
 
 const App = () => {
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState("?");
 
   const [requestAirdropButton, setRequestAirdropButton] = useState({
     text: BUTTON_TEXT,
@@ -69,7 +67,9 @@ const App = () => {
 
   const BalanceComponent = () => {
     return (
-      <Button mode="outlined" style={styles.balance}>{`${balance} SOL`}</Button>
+      <View style={styles.balanceContainer}>
+        <Text>{`${balance} SOL`}</Text>
+      </View>
     );
   };
 
@@ -92,7 +92,7 @@ const App = () => {
       <Background>
         <View style={styles.container}>
           {publicKey === null ? (
-            <View style={styles.contemt}>
+            <View style={styles.content}>
               <WalletMultiButton />
             </View>
           ) : (
@@ -132,8 +132,12 @@ const styles = StyleSheet.create({
   requestAirdropButton: {
     width: 300,
   },
-  balance: {
+  balanceContainer: {
     width: 200,
+    height: 50,
+    backgroundColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

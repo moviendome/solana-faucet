@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "solvers-wallet",
-    "slug": "solvers-wallet",
+    "name": "Solana Faucet",
+    "slug": "solana-faucet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,9 +13,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

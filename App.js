@@ -15,8 +15,6 @@ import {
   ConnectionProvider,
 } from "@solana/wallet-adapter-react";
 
-import { theme } from "./src/core/theme";
-
 import App from "./src/index";
 
 const Main = () => {
@@ -29,7 +27,7 @@ const Main = () => {
   );
 
   return (
-    <PaperProvider theme={theme}>
+    <PaperProvider>
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets}>
           <App />
@@ -40,5 +38,3 @@ const Main = () => {
 };
 
 export default Main;
-
-// <a href='https://www.freepik.com/photos/abstract-background'>Abstract background photo created by rawpixel.com - www.freepik.com</a>
