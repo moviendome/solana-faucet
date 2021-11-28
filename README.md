@@ -1,6 +1,3 @@
-# solana-faucet
-Simple Solana Faucet connecting with Phantom and Solflare using @solana/wallet-adapter
-
 # Solana Faucet App built with Expo, Web3 & React Native
 
 This is a simple Solana Faucet built with Expo, Web3 & React Native that connects with [Phantom](https://phantom.app/) and [Solflare](https://solflare.com/) using [@solana/wallet-adapter](https://github.com/solana-labs/wallet-adapter)
